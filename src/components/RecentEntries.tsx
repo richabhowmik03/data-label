@@ -12,7 +12,7 @@ interface RecentEntriesProps {
   entries: RecentEntry[];
 }
 
-const RecentEntries: React.FC<RecentEntriesProps> = ({ entries }) => {
+const RecentEntries: React.FC<RecentEntriesProps> = ({ entries, isDarkMode }) => {
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -25,24 +25,40 @@ const RecentEntries: React.FC<RecentEntriesProps> = ({ entries }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className={`rounded-xl shadow-sm border p-6 transition-colors duration-200 ${
+      isDarkMode 
+        ? 'bg-gray-800 border-gray-700' 
+        : 'bg-white border-gray-200'
+    }`}>
       <div className="flex items-center space-x-2 mb-4">
         <Clock className="h-5 w-5 text-blue-600" />
-        <h3 className="text-lg font-semibold text-gray-900">Recent Entries</h3>
+        <h3 className={`text-lg font-semibold transition-colors duration-200 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Recent Entries</h3>
       </div>
 
       {entries.length === 0 ? (
         <div className="text-center py-8">
-          <Clock className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-          <p className="text-gray-500">No recent entries</p>
-          <p className="text-sm text-gray-400">Processed data will appear here</p>
+          <Clock className={`h-12 w-12 mx-auto mb-2 transition-colors duration-200 ${
+            isDarkMode ? 'text-gray-500' : 'text-gray-400'
+          }`} />
+          <p className={`transition-colors duration-200 ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}>No recent entries</p>
+          <p className={`text-sm transition-colors duration-200 ${
+            isDarkMode ? 'text-gray-500' : 'text-gray-400'
+          }`}>Processed data will appear here</p>
         </div>
       ) : (
         <div className="space-y-4 max-h-96 overflow-y-auto">
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+              className={`border rounded-lg p-4 transition-colors ${
+                isDarkMode 
+                  ? 'border-gray-600 hover:border-blue-500 bg-gray-700/30' 
+                  : 'border-gray-200 hover:border-blue-300 bg-white'
+              }`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex flex-wrap gap-1">
@@ -50,24 +66,34 @@ const RecentEntries: React.FC<RecentEntriesProps> = ({ entries }) => {
                     entry.labels.map((label) => (
                       <span
                         key={label}
-                        className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-md"
+                        className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200 ${
+                          isDarkMode ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-100 text-blue-800'
+                        }`}
                       >
                         <Tag className="h-3 w-3 mr-1" />
                         {label}
                       </span>
                     ))
                   ) : (
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md">
+                    <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200 ${
+                      isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-600'
+                    }`}>
                       No labels
                     </span>
                   )}
                 </div>
-                <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                <span className={`text-xs whitespace-nowrap ml-2 transition-colors duration-200 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
                   {formatTime(entry.timestamp)}
                 </span>
               </div>
               
-              <div className="text-sm text-gray-600 bg-gray-50 rounded p-2 font-mono max-h-20 overflow-y-auto">
+              <div className={`text-sm rounded p-2 font-mono max-h-20 overflow-y-auto transition-colors duration-200 ${
+                isDarkMode 
+                  ? 'text-gray-300 bg-gray-700' 
+                  : 'text-gray-600 bg-gray-50'
+              }`}>
                 <pre className="whitespace-pre-wrap">
                   {JSON.stringify(entry.payload, null, 2)}
                 </pre>

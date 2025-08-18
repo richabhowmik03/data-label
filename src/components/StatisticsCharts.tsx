@@ -25,9 +25,10 @@ ChartJS.register(
 
 interface StatisticsChartsProps {
   statistics: Statistics;
+  isDarkMode: boolean;
 }
 
-const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ statistics }) => {
+const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ statistics, isDarkMode }) => {
   const labels = Object.keys(statistics.labelCounts);
   const data = Object.values(statistics.labelCounts);
 
@@ -76,11 +77,17 @@ const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ statistics }) => {
     scales: {
       y: {
         beginAtZero: true,
+        ticks: {
+          color: isDarkMode ? '#9CA3AF' : '#6B7280',
+        },
         grid: {
-          color: '#f3f4f6',
+          color: isDarkMode ? '#374151' : '#f3f4f6',
         },
       },
       x: {
+        ticks: {
+          color: isDarkMode ? '#9CA3AF' : '#6B7280',
+        },
         grid: {
           display: false,
         },
@@ -95,6 +102,7 @@ const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ statistics }) => {
       legend: {
         position: 'bottom' as const,
         labels: {
+          color: isDarkMode ? '#D1D5DB' : '#374151',
           boxWidth: 12,
           padding: 15,
         },
@@ -119,20 +127,32 @@ const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ statistics }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className={`rounded-xl shadow-sm border p-6 transition-colors duration-200 ${
+        isDarkMode 
+          ? 'bg-gray-800 border-gray-700' 
+          : 'bg-white border-gray-200'
+      }`}>
         <div className="flex items-center space-x-2 mb-4">
           <BarChart className="h-5 w-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Label Distribution</h3>
+          <h3 className={`text-lg font-semibold transition-colors duration-200 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>Label Distribution</h3>
         </div>
         <div className="h-64">
           <Bar data={barData} options={barOptions} />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className={`rounded-xl shadow-sm border p-6 transition-colors duration-200 ${
+        isDarkMode 
+          ? 'bg-gray-800 border-gray-700' 
+          : 'bg-white border-gray-200'
+      }`}>
         <div className="flex items-center space-x-2 mb-4">
           <PieChart className="h-5 w-5 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Label Percentage</h3>
+          <h3 className={`text-lg font-semibold transition-colors duration-200 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>Label Percentage</h3>
         </div>
         <div className="h-64">
           <Pie data={pieData} options={pieOptions} />

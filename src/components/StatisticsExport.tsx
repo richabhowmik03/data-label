@@ -8,7 +8,7 @@ interface StatisticsExportProps {
   statistics: Statistics;
 }
 
-const StatisticsExport: React.FC<StatisticsExportProps> = ({ statistics }) => {
+const StatisticsExport: React.FC<StatisticsExportProps> = ({ statistics, isDarkMode }) => {
   const [isExporting, setIsExporting] = useState(false);
 
   const exportToCSV = () => {

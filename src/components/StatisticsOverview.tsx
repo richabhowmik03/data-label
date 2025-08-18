@@ -6,7 +6,7 @@ interface StatisticsOverviewProps {
   statistics: Statistics;
 }
 
-const StatisticsOverview: React.FC<StatisticsOverviewProps> = ({ statistics }) => {
+const StatisticsOverview: React.FC<StatisticsOverviewProps> = ({ statistics, isDarkMode }) => {
   const totalLabels = Object.keys(statistics.labelCounts).length;
   const mostFrequentLabel = Object.entries(statistics.labelCounts).reduce(
     (max, [label, count]) => (count > max.count ? { label, count } : max),
@@ -76,9 +76,17 @@ const StatisticsOverview: React.FC<StatisticsOverviewProps> = ({ statistics }) =
         const Icon = card.icon;
 
         return (
-          <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div key={index} className={`rounded-xl shadow-sm border p-6 transition-colors duration-200 ${
+            isDarkMode 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+          }`}>
             <div className="flex items-center justify-between">
-              <div className={`p-3 ${colors.bg} rounded-lg`}>
+              <div className={`p-3 rounded-lg transition-colors duration-200 ${
+                isDarkMode 
+                  ? `bg-${card.color}-900/20` 
+                  : colors.bg
+              }`}>
                 <Icon className={`h-6 w-6 ${colors.icon}`} />
               </div>
               <span className={`text-sm font-medium ${colors.change}`}>
@@ -87,10 +95,16 @@ const StatisticsOverview: React.FC<StatisticsOverviewProps> = ({ statistics }) =
             </div>
             
             <div className="mt-4">
-              <h3 className="text-sm font-medium text-gray-500">{card.title}</h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{card.value}</p>
+              <h3 className={`text-sm font-medium transition-colors duration-200 ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>{card.title}</h3>
+              <p className={`text-2xl font-bold mt-1 transition-colors duration-200 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>{card.value}</p>
               {card.subtitle && (
-                <p className="text-sm text-gray-500 mt-1">{card.subtitle}</p>
+                <p className={`text-sm mt-1 transition-colors duration-200 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>{card.subtitle}</p>
               )}
             </div>
           </div>
