@@ -5,7 +5,11 @@ import RulesList from '../components/RulesList';
 import { Rule } from '../types/Rule';
 import { ruleService } from '../services/ruleService';
 
-const ConfigurationPage: React.FC = () => {
+interface ConfigurationPageProps {
+  isDarkMode: boolean;
+}
+
+const ConfigurationPage: React.FC<ConfigurationPageProps> = ({ isDarkMode }) => {
   const [jsonKeys, setJsonKeys] = useState<string[]>([]);
   const [rules, setRules] = useState<Rule[]>([]);
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
@@ -106,15 +110,19 @@ const ConfigurationPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Configuration</h2>
-        <p className="text-gray-600">
+        <h2 className={`text-3xl font-bold mb-2 transition-colors duration-200 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Configuration</h2>
+        <p className={`transition-colors duration-200 ${
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        }`}>
           Configure data labeling rules by providing sample JSON and defining custom labeling logic.
         </p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <div className="space-y-8">
-          <JsonInput onKeysChange={handleJsonKeysChange} rules={rules} />
+          <JsonInput onKeysChange={handleJsonKeysChange} rules={rules} isDarkMode={isDarkMode} />
           
           <RuleBuilder
             availableKeys={jsonKeys}
@@ -122,6 +130,7 @@ const ConfigurationPage: React.FC = () => {
             onRuleCreate={handleRuleCreate}
             onRuleUpdate={handleRuleUpdate}
             onCancel={handleCancelEdit}
+            isDarkMode={isDarkMode}
           />
         </div>
 
@@ -131,6 +140,7 @@ const ConfigurationPage: React.FC = () => {
             onRuleEdit={handleRuleEdit}
             onRuleDelete={handleRuleDelete}
             onRuleToggle={handleRuleToggle}
+            isDarkMode={isDarkMode}
           />
         </div>
       </div>
