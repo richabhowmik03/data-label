@@ -202,6 +202,7 @@ app.post('/api/test', (req, res) => {
       timestamp: new Date()
     });
   } catch (error) {
+    console.error('Test endpoint error:', error);
     res.status(400).json({ error: 'Testing failed', details: error.message });
   }
 });
