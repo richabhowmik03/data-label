@@ -9,12 +9,14 @@ interface StatisticsFiltersProps {
   };
   availableLabels: string[];
   onFiltersChange: (filters: { label: string; from: string; to: string }) => void;
+  isDarkMode: boolean;
 }
 
 const StatisticsFilters: React.FC<StatisticsFiltersProps> = ({
   filters,
   availableLabels,
-  onFiltersChange
+  onFiltersChange,
+  isDarkMode
 }) => {
   const handleFilterChange = (field: string, value: string) => {
     onFiltersChange({
