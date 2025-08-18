@@ -73,9 +73,8 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
       return;
     }
 
-      console.error('Test error:', err);
-      setError(`Failed to test rules: ${err instanceof Error ? err.message : 'Unknown error'}`);
     setError('');
+    setIsTesting(true);
 
     try {
       const parsed = JSON.parse(jsonValue);
