@@ -186,30 +186,23 @@ app.post('/api/process', (req, res) => {
 
 // Test endpoint (doesn't save to dashboard)
 app.post('/api/test', (req, res) => {
-  console.log('Test endpoint called with payload:', req.body);
   try {
     const payload = req.body;
-    console.log('Evaluating rules for payload:', payload);
-    console.log('Available rules:', rules.length);
     const appliedLabels = [];
     
     // Evaluate all active rules
     for (const rule of rules) {
-      console.log('Evaluating rule:', rule.name, 'enabled:', rule.enabled);
       if (evaluateRule(payload, rule)) {
-        console.log('Rule matched:', rule.name, 'label:', rule.label);
         appliedLabels.push(rule.label);
       }
     }
     
-    console.log('Final applied labels:', appliedLabels);
+    // Don't store in processedData or update statistics for test
     res.json({
       labels: appliedLabels,
       timestamp: new Date()
     });
   } catch (error) {
-    console.error('Test endpoint error:', error);
-    console.error('Error stack:', error.stack);
     res.status(400).json({ error: 'Testing failed', details: error.message });
   }
 });
