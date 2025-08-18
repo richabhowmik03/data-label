@@ -2,7 +2,7 @@
 
 A sophisticated data labeling system that automatically processes JSON payloads using user-defined rules and provides comprehensive analytics.
 
-## 🚀 Features
+##  Features
 
 ### Configuration Management
 - **JSON Schema Detection**: Automatic extraction of keys from sample JSON
@@ -24,7 +24,7 @@ A sophisticated data labeling system that automatically processes JSON payloads 
 - **Efficient Storage**: In-memory data structures for optimal performance
 - **Error Handling**: Comprehensive validation and error reporting
 
-## 📋 API Documentation
+## API Documentation
 
 ### Rules Endpoints
 ```
@@ -77,7 +77,7 @@ npm run build
 npm run preview
 ```
 
-## 📊 Sample Data
+## Sample Data
 
 The system comes pre-configured with sample rules and supports the following JSON structure:
 
@@ -101,7 +101,7 @@ The system comes pre-configured with sample rules and supports the following JSO
 2. **Standard Price Range**: Products with price = 2 → "Orange"
 3. **Low MOQ Products**: MOQ < 100 AND Price < 1.5 → "Green"
 
-## 🏗️ Architecture
+## Architecture
 
 ### Frontend (React + TypeScript)
 - **Pages**: Configuration and Dashboard
@@ -121,14 +121,7 @@ The system comes pre-configured with sample rules and supports the following JSO
 - **Development**: Vite, ESLint, Concurrent execution
 - **Export**: jsPDF, Papa Parse for CSV/PDF generation
 
-## 🧪 Testing
-
-Run the test suite:
-```bash
-npm test
-```
-
-## 📈 Usage Examples
+## Usage Examples
 
 ### Creating Rules
 1. Navigate to Configuration page
@@ -153,36 +146,7 @@ curl -X POST http://localhost:3001/api/process \
 - Export reports in CSV or PDF format
 - Monitor recent processing activity
 
-## 🔧 Configuration
-
-The system stores rules and processed data in memory. For production use, consider:
-- Implementing persistent storage (database)
-- Adding authentication and authorization
-- Setting up proper logging and monitoring
-- Implementing rate limiting and caching
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 🆘 Support
-
-For issues and questions:
-1. Check the API documentation at `/api/docs`
-2. Review the sample data and pre-configured rules
-3. Ensure proper JSON formatting for payloads
-4. Verify rule conditions match available keys
-
-## 🎯 Assumptions Made
+## Assumptions Made
 
 - JSON payloads follow consistent schema structure
 - Rule priorities are positive integers (higher = more important)
@@ -190,5 +154,3 @@ For issues and questions:
 - Date filtering uses ISO date format (YYYY-MM-DD)
 - Export functionality requires modern browser support
 - Real-time updates use polling mechanism (10-second intervals)
-
-The system prioritizes working functionality over complex features, making it suitable for production use while remaining extensible for future enhancements.
