@@ -52,5 +52,15 @@ export const ruleService = {
     });
     if (!response.ok) throw new Error('Failed to process payload');
     return response.json();
+  },
+
+  async testPayload(payload: any): Promise<{ labels: string[]; timestamp: string }> {
+    const response = await fetch(`${API_BASE}/test`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error('Failed to test payload');
+    return response.json();
   }
 };

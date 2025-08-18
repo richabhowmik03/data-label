@@ -76,7 +76,6 @@ const DashboardPage: React.FC = () => {
             <StatisticsCharts statistics={statistics} />
           </div>
           <div className="space-y-6">
-            <JsonProcessor onProcessComplete={handleProcessComplete} />
             <RecentEntries entries={statistics.recentEntries || []} />
           </div>
         </div>

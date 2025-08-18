@@ -60,6 +60,14 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
   };
 
   const testRules = async () => {
+    await processRules(false);
+  };
+
+  const addToDashboard = async () => {
+    await processRules(true);
+  };
+
+  const processRules = async (addToDashboard: boolean) => {
     if (!isValid || !jsonValue.trim()) {
       setError('Please provide valid JSON first');
       return;
@@ -70,15 +78,16 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
 
     try {
       const parsed = JSON.parse(jsonValue);
-      const result = await ruleService.processPayload(parsed);
+      const result = addToDashboard 
+        ? await ruleService.processPayload(parsed)
+        : await ruleService.testPayload(parsed);
       setTestResults(result);
     } catch (err) {
-      setError('Failed to test rules. Please check your JSON and try again.');
+      setError(`Failed to ${addToDashboard ? 'process' : 'test'} rules. Please check your JSON and try again.`);
       setTestResults(null);
     } finally {
       setIsTesting(false);
     }
-  };
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
@@ -119,14 +128,25 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
 
         {isValid && (
           <div className="flex justify-between items-center">
-            <button
-              onClick={testRules}
-              disabled={isTesting || rules.length === 0}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <Play className="h-4 w-4" />
-              <span>{isTesting ? 'Testing...' : 'Test Rules'}</span>
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={testRules}
+                disabled={isTesting || rules.length === 0}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Play className="h-4 w-4" />
+                <span>{isTesting ? 'Testing...' : 'Test Rules'}</span>
+              </button>
+              
+              <button
+                onClick={addToDashboard}
+                disabled={isTesting || rules.length === 0}
+                className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Tag className="h-4 w-4" />
+                <span>{isTesting ? 'Processing...' : 'Add to Dashboard'}</span>
+              </button>
+            </div>
             
             {rules.length === 0 && (
               <span className="text-sm text-gray-500">Create some rules first to test</span>

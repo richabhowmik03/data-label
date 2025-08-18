@@ -184,6 +184,28 @@ app.post('/api/process', (req, res) => {
   }
 });
 
+// Test endpoint (doesn't save to dashboard)
+app.post('/api/test', (req, res) => {
+  try {
+    const payload = req.body;
+    const appliedLabels = [];
+    
+    // Evaluate all active rules
+    for (const rule of rules) {
+      if (evaluateRule(payload, rule)) {
+        appliedLabels.push(rule.label);
+      }
+    }
+    
+    res.json({
+      labels: appliedLabels,
+      timestamp: new Date()
+    });
+  } catch (error) {
+    res.status(400).json({ error: 'Testing failed', details: error.message });
+  }
+});
+
 // Statistics endpoint
 app.get('/api/statistics', (req, res) => {
   try {
