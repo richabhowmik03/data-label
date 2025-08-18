@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { Upload, FileText, Check, AlertCircle } from 'lucide-react';
+import { Upload, FileText, Check, AlertCircle, Play, Tag } from 'lucide-react';
+import { ruleService } from '../services/ruleService';
 
 interface JsonInputProps {
   onKeysChange: (keys: string[]) => void;
+  rules: any[];
 }
 
-const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange }) => {
+const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
   const [jsonValue, setJsonValue] = useState('');
   const [extractedKeys, setExtractedKeys] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const [testResults, setTestResults] = useState<{ labels: string[]; timestamp: string } | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
 
   const sampleJson = `{
   "CompanyName": "Fortune Company",
@@ -55,6 +59,26 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange }) => {
     handleJsonChange(sampleJson);
   };
 
+  const testRules = async () => {
+    if (!isValid || !jsonValue.trim()) {
+      setError('Please provide valid JSON first');
+      return;
+    }
+
+    setIsTesting(true);
+    setError('');
+
+    try {
+      const parsed = JSON.parse(jsonValue);
+      const result = await ruleService.processPayload(parsed);
+      setTestResults(result);
+    } catch (err) {
+      setError('Failed to test rules. Please check your JSON and try again.');
+      setTestResults(null);
+    } finally {
+      setIsTesting(false);
+    }
+  };
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
@@ -90,6 +114,57 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange }) => {
           <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-lg">
             <AlertCircle className="h-5 w-5" />
             <span className="text-sm">{error}</span>
+          </div>
+        )}
+
+        {isValid && (
+          <div className="flex justify-between items-center">
+            <button
+              onClick={testRules}
+              disabled={isTesting || rules.length === 0}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Play className="h-4 w-4" />
+              <span>{isTesting ? 'Testing...' : 'Test Rules'}</span>
+            </button>
+            
+            {rules.length === 0 && (
+              <span className="text-sm text-gray-500">Create some rules first to test</span>
+            )}
+          </div>
+        )}
+
+        {testResults && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center space-x-2 mb-3">
+              <Tag className="h-5 w-5 text-blue-600" />
+              <span className="text-sm font-medium text-blue-800">
+                Test Results
+              </span>
+              <span className="text-xs text-blue-600">
+                {new Date(testResults.timestamp).toLocaleTimeString()}
+              </span>
+            </div>
+            
+            {testResults.labels.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-sm text-blue-700">Applied Labels:</p>
+                <div className="flex flex-wrap gap-2">
+                  {testResults.labels.map((label, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full border border-blue-300"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-blue-700">
+                No rules matched this JSON payload.
+              </p>
+            )}
           </div>
         )}
 

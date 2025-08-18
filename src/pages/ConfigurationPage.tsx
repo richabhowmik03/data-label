@@ -115,6 +115,7 @@ const ConfigurationPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <div className="space-y-8">
           <JsonInput onKeysChange={handleJsonKeysChange} />
+          <JsonInput onKeysChange={handleJsonKeysChange} rules={rules} />
           
           <RuleBuilder
             availableKeys={jsonKeys}
