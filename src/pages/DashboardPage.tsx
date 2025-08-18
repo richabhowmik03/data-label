@@ -4,6 +4,7 @@ import StatisticsCharts from '../components/StatisticsCharts';
 import StatisticsFilters from '../components/StatisticsFilters';
 import StatisticsExport from '../components/StatisticsExport';
 import RecentEntries from '../components/RecentEntries';
+import JsonProcessor from '../components/JsonProcessor';
 import { Statistics } from '../types/Statistics';
 import { statisticsService } from '../services/statisticsService';
 
@@ -38,6 +39,10 @@ const DashboardPage: React.FC = () => {
     setFilters(newFilters);
   };
 
+  const handleProcessComplete = () => {
+    loadStatistics(); // Refresh statistics after processing
+  };
+
   if (isLoading && !statistics) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -66,11 +71,12 @@ const DashboardPage: React.FC = () => {
 
       {statistics && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
             <StatisticsOverview statistics={statistics} />
             <StatisticsCharts statistics={statistics} />
           </div>
-          <div>
+          <div className="space-y-6">
+            <JsonProcessor onProcessComplete={handleProcessComplete} />
             <RecentEntries entries={statistics.recentEntries || []} />
           </div>
         </div>
