@@ -83,7 +83,7 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules }) => {
         : await ruleService.testPayload(parsed);
       setTestResults(result);
     } catch (err) {
-      console.error('Frontend error during rule processing:', error);
+      console.error('Frontend error during rule processing:', err);
       setError(`Failed to ${addToDashboard ? 'process' : 'test'} rules. Please check your JSON and try again.`);
       setTestResults(null);
     } finally {
