@@ -60,7 +60,10 @@ export const ruleService = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error('Failed to test payload');
+    if (!response.ok) {
+      const errorData = await response.text();
+      throw new Error(`Failed to test payload: ${response.status} ${response.statusText} - ${errorData}`);
+    }
     return response.json();
   }
 };
