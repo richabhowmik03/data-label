@@ -23,7 +23,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ isDarkMode }) => {
 
   useEffect(() => {
     loadStatistics();
-    const interval = setInterval(loadStatistics, 10000); // Refresh every 10 seconds
+    const interval = setInterval(loadStatistics, 5000); // Refresh every 5 seconds
     return () => clearInterval(interval);
   }, [filters]);
 
@@ -44,7 +44,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ isDarkMode }) => {
   };
 
   const handleProcessComplete = () => {
-    loadStatistics(); // Refresh statistics after processing
+    // Add a small delay to ensure the data is processed
+    setTimeout(() => {
+      loadStatistics();
+    }, 1000);
   };
 
   if (isLoading && !statistics) {
