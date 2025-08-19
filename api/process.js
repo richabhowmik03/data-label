@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { rules, processedData, evaluateRule, updateStatistics } from './_shared/data.js';
+import { storage, getRules, evaluateRule, updateStatistics } from './_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -15,12 +15,16 @@ export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const payload = req.body;
+      const rules = getRules();
       const appliedLabels = [];
+      
+      console.log(`[API] Processing payload with ${rules.length} rules`);
       
       // Evaluate all active rules
       for (const rule of rules) {
         if (evaluateRule(payload, rule)) {
           appliedLabels.push(rule.label);
+          console.log(`[API] Rule "${rule.name}" matched, applied label: ${rule.label}`);
         }
       }
       
@@ -32,10 +36,12 @@ export default function handler(req, res) {
         timestamp: new Date().toISOString()
       };
       
-      processedData.push(processedEntry);
+      storage.processedData.push(processedEntry);
       updateStatistics(appliedLabels);
       
-      console.log(`Processed entry with labels: ${appliedLabels.join(', ')}`);
+      console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);
+      console.log(`[API] Total processed: ${storage.statistics.totalProcessed}`);
+      console.log(`[API] Label counts:`, storage.statistics.labelCounts);
       
       res.status(200).json({
         id: processedEntry.id,
@@ -43,7 +49,7 @@ export default function handler(req, res) {
         timestamp: processedEntry.timestamp
       });
     } catch (error) {
-      console.error('Processing failed:', error);
+      console.error('[API] Processing failed:', error);
       res.status(400).json({ error: 'Processing failed', details: error.message });
     }
     return;

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { rules } from './_shared/data.js';
+import { storage, getRules } from './_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -13,7 +13,8 @@ export default function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    console.log(`Returning ${rules.length} rules`);
+    const rules = getRules();
+    console.log(`[API] Returning ${rules.length} rules`);
     res.status(200).json(rules);
     return;
   }
@@ -31,11 +32,13 @@ export default function handler(req, res) {
         updatedAt: new Date().toISOString()
       };
       
-      rules.push(rule);
-      rules.sort((a, b) => b.priority - a.priority);
+      storage.rules.push(rule);
+      storage.rules.sort((a, b) => b.priority - a.priority);
       
+      console.log(`[API] Created rule: ${rule.name}`);
       res.status(201).json(rule);
     } catch (error) {
+      console.error('[API] Rule creation failed:', error);
       res.status(400).json({ error: 'Invalid rule format', details: error.message });
     }
     return;

@@ -1,5 +1,9 @@
 // Shared data store for Vercel serverless functions
-let rules = [
+// Note: In serverless environments, this data resets between function invocations
+// For production, you'd want to use a database like Supabase, MongoDB, or Redis
+
+// Initialize with default rules every time (since serverless functions are stateless)
+const defaultRules = [
   {
     id: 'default-rule-1',
     name: 'High Value Companies',
@@ -59,11 +63,20 @@ let rules = [
   }
 ];
 
+// Global storage - will reset between serverless function invocations
+let rules = [...defaultRules];
 let processedData = [];
-let statistics = {
-  totalProcessed: 0,
-  labelCounts: {},
-  lastUpdated: new Date().toISOString()
+
+// Simple in-memory storage for demo purposes
+// In production, you'd use a proper database
+const storage = {
+  rules: [...defaultRules],
+  processedData: [],
+  statistics: {
+    totalProcessed: 0,
+    labelCounts: {},
+    lastUpdated: new Date().toISOString()
+  }
 };
 
 // Utility functions
@@ -116,18 +129,33 @@ function evaluateRule(data, rule) {
 }
 
 function updateStatistics(labels) {
-  statistics.totalProcessed++;
+  storage.statistics.totalProcessed++;
   labels.forEach(label => {
-    statistics.labelCounts[label] = (statistics.labelCounts[label] || 0) + 1;
+    storage.statistics.labelCounts[label] = (storage.statistics.labelCounts[label] || 0) + 1;
   });
-  statistics.lastUpdated = new Date().toISOString();
+  storage.statistics.lastUpdated = new Date().toISOString();
+}
+
+// Get current data (always fresh)
+function getRules() {
+  return storage.rules.length > 0 ? storage.rules : [...defaultRules];
+}
+
+function getProcessedData() {
+  return storage.processedData;
+}
+
+function getStatistics() {
+  return storage.statistics;
 }
 
 // Export data and functions
 export {
-  rules,
-  processedData,
-  statistics,
+  storage,
+  defaultRules,
   evaluateRule,
-  updateStatistics
+  updateStatistics,
+  getRules,
+  getProcessedData,
+  getStatistics
 };

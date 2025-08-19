@@ -1,4 +1,4 @@
-import { rules, evaluateRule } from './_shared/data.js';
+import { getRules, evaluateRule } from './_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -14,19 +14,26 @@ export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const payload = req.body;
+      const rules = getRules();
       const appliedLabels = [];
+      
+      console.log(`[API] Testing payload with ${rules.length} rules`);
       
       for (const rule of rules) {
         if (evaluateRule(payload, rule)) {
           appliedLabels.push(rule.label);
+          console.log(`[API] Test - Rule "${rule.name}" matched, label: ${rule.label}`);
         }
       }
+      
+      console.log(`[API] Test result - Labels: [${appliedLabels.join(', ')}]`);
       
       res.status(200).json({
         labels: appliedLabels,
         timestamp: new Date().toISOString()
       });
     } catch (error) {
+      console.error('[API] Testing failed:', error);
       res.status(400).json({ error: 'Testing failed', details: error.message });
     }
     return;

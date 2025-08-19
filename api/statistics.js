@@ -1,4 +1,4 @@
-import { processedData, statistics } from './_shared/data.js';
+import { storage, getProcessedData, getStatistics } from './_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -14,17 +14,20 @@ export default function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const { label, from, to } = req.query;
-      let filteredData = processedData;
+      let filteredData = getProcessedData();
+      
+      console.log(`[API] Statistics request - Total entries: ${filteredData.length}`);
       
       // Apply date filters
       if (from || to) {
         const fromDate = from ? new Date(from) : new Date(0);
         const toDate = to ? new Date(to) : new Date();
         
-        filteredData = processedData.filter(entry => {
+        filteredData = filteredData.filter(entry => {
           const entryDate = new Date(entry.timestamp);
           return entryDate >= fromDate && entryDate <= toDate;
         });
+        console.log(`[API] After date filter: ${filteredData.length} entries`);
       }
       
       // Apply label filter
@@ -32,9 +35,10 @@ export default function handler(req, res) {
         filteredData = filteredData.filter(entry => 
           entry.labels.includes(label)
         );
+        console.log(`[API] After label filter (${label}): ${filteredData.length} entries`);
       }
       
-      // Calculate statistics from current data
+      // Calculate statistics from filtered data
       const labelCounts = {};
       let totalProcessed = filteredData.length;
       
@@ -51,17 +55,23 @@ export default function handler(req, res) {
           : 0;
       });
       
-      console.log(`Statistics: ${totalProcessed} total, ${Object.keys(labelCounts).length} unique labels`);
-      
-      res.status(200).json({
+      const result = {
         totalProcessed,
         labelCounts,
         labelPercentages,
-        lastUpdated: statistics.lastUpdated,
+        lastUpdated: storage.statistics.lastUpdated,
         recentEntries: filteredData.slice(-10).reverse()
+      };
+      
+      console.log(`[API] Returning statistics:`, {
+        totalProcessed: result.totalProcessed,
+        labelCounts: result.labelCounts,
+        recentEntriesCount: result.recentEntries.length
       });
+      
+      res.status(200).json(result);
     } catch (error) {
-      console.error('Statistics query failed:', error);
+      console.error('[API] Statistics query failed:', error);
       res.status(400).json({ error: 'Statistics query failed', details: error.message });
     }
     return;
