@@ -1,4 +1,3 @@
-// Default rules (should be shared with rules.js)
 const rules = [
   {
     id: 'default-rule-1',
@@ -123,14 +122,12 @@ export default function handler(req, res) {
       const payload = req.body;
       const appliedLabels = [];
       
-      // Evaluate all active rules
       for (const rule of rules) {
         if (evaluateRule(payload, rule)) {
           appliedLabels.push(rule.label);
         }
       }
       
-      // Don't store in processedData or update statistics for test
       res.status(200).json({
         labels: appliedLabels,
         timestamp: new Date().toISOString()
