@@ -368,7 +368,7 @@ app.get('*', (req, res) => {
 const sampleRules = [
   {
     id: uuidv4(),
-    name: 'Google or Amazon with Price condition',
+    name: 'CompanyName = "Google" OR (CompanyName = "Amazon" AND Price < 2.5)',
     conditions: {
       type: 'group',
       operator: 'OR',
@@ -385,19 +385,20 @@ const sampleRules = [
       ]
     },
     label: 'Green',
-    priority: 1,
+    priority: 3,
     enabled: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
     id: uuidv4(),
-    name: 'Price equals 2',
+    name: 'Price = 2',
     conditions: {
-      type: 'condition',
-      key: 'Price',
-      operator: '=',
-      value: '2'
+      type: 'group',
+      operator: 'AND',
+      conditions: [
+        { type: 'condition', key: 'Price', operator: '=', value: '2' }
+      ]
     },
     label: 'Orange',
     priority: 2,
@@ -407,7 +408,7 @@ const sampleRules = [
   },
   {
     id: uuidv4(),
-    name: 'Low MOQ and Price condition',
+    name: 'MOQ < 100 AND Price < 1.5',
     conditions: {
       type: 'group',
       operator: 'AND',
@@ -417,7 +418,7 @@ const sampleRules = [
       ]
     },
     label: 'Green',
-    priority: 3,
+    priority: 1,
     enabled: true,
     createdAt: new Date(),
     updatedAt: new Date()
