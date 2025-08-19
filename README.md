@@ -1,4 +1,4 @@
-# Advanced Data Labeling Engine
+# Data Labeling Engine
 
 A sophisticated data labeling system that automatically processes JSON payloads using user-defined rules and provides comprehensive analytics.
 
