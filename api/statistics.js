@@ -1,4 +1,3 @@
-// Shared storage (in production, use a database)
 let processedData = [];
 
 export default function handler(req, res) {
