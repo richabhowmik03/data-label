@@ -1,4 +1,4 @@
-import { database } from '../lib/database.js';
+import { simpleStore } from '../lib/simple-store.js';
 
 export default async function handler(req, res) {
   console.log('[API] Statistics endpoint called');
@@ -21,8 +21,27 @@ export default async function handler(req, res) {
     const { label, from, to } = req.query;
     console.log('[API] Fetching statistics with filters:', { label, from, to });
 
-    // Get statistics from database
-    const statistics = await database.getStatistics({ label, from, to });
+    // Try to get statistics from central data API first
+    let statistics;
+    try {
+      const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
+      const params = new URLSearchParams();
+      if (label) params.append('label', label);
+      if (from) params.append('from', from);
+      if (to) params.append('to', to);
+      params.append('action', 'get-statistics');
+      
+      const response = await fetch(`${baseUrl}/api/data?${params}`);
+      if (response.ok) {
+        statistics = await response.json();
+        console.log('[API] Got statistics from central data API');
+      } else {
+        throw new Error('Central API failed');
+      }
+    } catch (error) {
+      console.log('[API] Central data API not available, using local store');
+      statistics = simpleStore.getStatistics({ label, from, to });
+    }
 
     console.log(`[API] Returning statistics:`, {
       totalProcessed: statistics.totalProcessed,

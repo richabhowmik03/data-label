@@ -1,4 +1,4 @@
-import { database, evaluateRule } from '../lib/database.js';
+import { simpleStore, evaluateRule } from '../lib/simple-store.js';
 
 export default async function handler(req, res) {
   console.log('[API] Test endpoint called');
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     console.log('[API] Testing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await database.getRules();
+    const allRules = simpleStore.getRules();
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Testing with ${rules.length} active rules`);

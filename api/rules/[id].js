@@ -1,4 +1,4 @@
-import { database } from '../../lib/database.js';
+import { simpleStore } from '../../lib/simple-store.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       const { name, conditions, label, priority, enabled } = req.body;
 
       console.log(`[API] Updating rule: ${id}`);
-      const rule = await database.updateRule(id, {
+      const rule = simpleStore.updateRule(id, {
         name,
         conditions,
         label,
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       console.log(`[API] Deleting rule: ${id}`);
-      await database.deleteRule(id);
+      simpleStore.deleteRule(id);
       console.log(`[API] Deleted rule: ${id}`);
       return res.status(204).end();
     }

@@ -1,4 +1,4 @@
-import { database } from '../lib/database.js';
+import { simpleStore } from '../lib/simple-store.js';
 
 export default async function handler(req, res) {
   console.log(`[API] Rules endpoint called - Method: ${req.method}`);
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const rules = await database.getRules();
+      const rules = simpleStore.getRules();
       console.log(`[API] Returning ${rules.length} rules`);
       return res.status(200).json(rules);
     }
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString()
       };
       
-      const createdRule = await database.createRule(newRule);
+      const createdRule = simpleStore.addRule(newRule);
       console.log(`[API] Created rule with ID: ${createdRule.id}`);
       return res.status(201).json(createdRule);
     }

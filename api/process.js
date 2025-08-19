@@ -1,4 +1,4 @@
-import { database, evaluateRule } from '../lib/database.js';
+import { simpleStore, evaluateRule } from '../lib/simple-store.js';
 
 export default async function handler(req, res) {
   console.log('[API] Process endpoint called');
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     console.log('[API] Processing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await database.getRules();
+    const allRules = simpleStore.getRules();
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Processing with ${rules.length} active rules`);
@@ -48,7 +48,22 @@ export default async function handler(req, res) {
       created_at: new Date().toISOString()
     };
 
-    await database.addProcessedEntry(processedEntry);
+    // Store in local store
+    simpleStore.addProcessedEntry(processedEntry);
+    
+    // Also try to store via central data API for cross-function access
+    try {
+      const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/data?action=add-processed`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(processedEntry)
+      });
+      console.log('[API] Stored in central data API:', response.status);
+    } catch (error) {
+      console.log('[API] Central data API not available, using local store only');
+    }
+    
     console.log('[API] Stored processed entry:', processedEntry.id);
 
     const response = {
