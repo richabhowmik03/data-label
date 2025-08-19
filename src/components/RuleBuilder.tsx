@@ -212,13 +212,13 @@ const RuleBuilder: React.FC<RuleBuilderProps> = ({
   };
 
   const renderCondition = (condition: RuleCondition, groupPath: number[], conditionIndex: number) => (
-    <div key={conditionIndex} className={`flex items-center space-x-2 p-3 rounded-lg transition-colors duration-200 ${
+    <div key={conditionIndex} className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 ${
       isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
     }`}>
       <select
         value={condition.key}
         onChange={(e) => updateCondition(groupPath, conditionIndex, 'key', e.target.value)}
-        className={`flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+        className={`flex-1 p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
           isDarkMode 
             ? 'border-gray-600 bg-gray-600 text-white' 
             : 'border-gray-300 bg-white text-gray-900'
@@ -233,7 +233,7 @@ const RuleBuilder: React.FC<RuleBuilderProps> = ({
       <select
         value={condition.operator}
         onChange={(e) => updateCondition(groupPath, conditionIndex, 'operator', e.target.value)}
-        className={`p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+        className={`p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
           isDarkMode 
             ? 'border-gray-600 bg-gray-600 text-white' 
             : 'border-gray-300 bg-white text-gray-900'
@@ -249,7 +249,7 @@ const RuleBuilder: React.FC<RuleBuilderProps> = ({
         value={condition.value}
         onChange={(e) => updateCondition(groupPath, conditionIndex, 'value', e.target.value)}
         placeholder="Value"
-        className={`flex-1 p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
+        className={`flex-1 p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 ${
           isDarkMode 
             ? 'border-gray-600 bg-gray-600 text-white placeholder-gray-400' 
             : 'border-gray-300 bg-white text-gray-900'
@@ -259,9 +259,12 @@ const RuleBuilder: React.FC<RuleBuilderProps> = ({
       <button
         type="button"
         onClick={() => removeCondition(groupPath, conditionIndex)}
-        className={`p-2 text-red-600 rounded-md transition-colors ${
-          isDarkMode ? 'hover:bg-red-900/20' : 'hover:bg-red-100'
+        className={`p-2 text-red-600 hover:text-red-700 rounded-md transition-colors ${
+          isDarkMode 
+            ? 'hover:bg-red-900/20 bg-gray-600' 
+            : 'hover:bg-red-100 bg-white border border-gray-300'
         }`}
+        title="Remove condition"
       >
         <Minus className="h-4 w-4" />
       </button>

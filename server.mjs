@@ -368,7 +368,7 @@ app.get('*', (req, res) => {
 const sampleRules = [
   {
     id: uuidv4(),
-    name: 'CompanyName Google or Amazon with Price condition',
+    name: 'Google or Amazon with Price condition',
     conditions: {
       type: 'group',
       operator: 'OR',
@@ -418,58 +418,6 @@ const sampleRules = [
     },
     label: 'Green',
     priority: 3,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: uuidv4(),
-    name: 'Chocolate Low Price',
-    conditions: {
-      type: 'group',
-      operator: 'AND',
-      conditions: [
-        { type: 'condition', key: 'Product', operator: '=', value: 'Chocolate' },
-        { type: 'condition', key: 'Price', operator: '<', value: '2' }
-      ]
-    },
-    label: 'Green',
-    priority: 4,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: uuidv4(),
-    name: 'Chocolate Medium Price',
-    conditions: {
-      type: 'group',
-      operator: 'AND',
-      conditions: [
-        { type: 'condition', key: 'Product', operator: '=', value: 'Chocolate' },
-        { type: 'condition', key: 'Price', operator: '>=', value: '2' },
-        { type: 'condition', key: 'Price', operator: '<', value: '5' }
-      ]
-    },
-    label: 'Yellow',
-    priority: 5,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: uuidv4(),
-    name: 'Chocolate High Price',
-    conditions: {
-      type: 'group',
-      operator: 'AND',
-      conditions: [
-        { type: 'condition', key: 'Product', operator: '=', value: 'Chocolate' },
-        { type: 'condition', key: 'Price', operator: '>=', value: '5' }
-      ]
-    },
-    label: 'Red',
-    priority: 6,
     enabled: true,
     createdAt: new Date(),
     updatedAt: new Date()
