@@ -1,4 +1,4 @@
-import { db } from '../lib/supabase.js';
+import { storage } from '../lib/storage.js';
 
 export default async function handler(req, res) {
   console.log('[API] Statistics endpoint called');
@@ -23,14 +23,25 @@ export default async function handler(req, res) {
     console.log('[API] Fetching statistics with filters:', { label, from, to });
 
     // Get processed data with filters
-    const processedData = await db.getProcessedData({ from, to });
+    const processedData = await storage.getProcessedData();
+    console.log(`[API] Found ${processedData.length} total processed entries`);
 
-    console.log(`[API] Found ${processedData.length} processed entries:`, processedData);
-
-    // Apply label filter if specified
+    // Apply date filters
     let filteredData = processedData;
+    if (from || to) {
+      const fromDate = from ? new Date(from) : new Date(0);
+      const toDate = to ? new Date(to) : new Date();
+      
+      filteredData = processedData.filter(entry => {
+        const entryDate = new Date(entry.created_at);
+        return entryDate >= fromDate && entryDate <= toDate;
+      });
+      console.log(`[API] After date filter: ${filteredData.length} entries`);
+    }
+
+    // Apply label filter
     if (label) {
-      filteredData = processedData.filter(entry => 
+      filteredData = filteredData.filter(entry => 
         entry.labels && Array.isArray(entry.labels) && entry.labels.includes(label)
       );
       console.log(`[API] After label filter (${label}): ${filteredData.length} entries`);
@@ -57,12 +68,15 @@ export default async function handler(req, res) {
     });
 
     // Get recent entries (last 10)
-    const recentEntries = filteredData.slice(0, 10).map(entry => ({
-      id: entry.id,
-      payload: entry.payload,
-      labels: entry.labels || [],
-      timestamp: entry.created_at
-    }));
+    const recentEntries = filteredData
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10)
+      .map(entry => ({
+        id: entry.id,
+        payload: entry.payload,
+        labels: entry.labels || [],
+        timestamp: entry.created_at
+      }));
 
     const result = {
       totalProcessed,

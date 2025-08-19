@@ -1,9 +1,8 @@
-import { db, evaluateRule } from '../lib/supabase.js';
+import { storage, evaluateRule } from '../lib/storage.js';
 
 export default async function handler(req, res) {
   console.log('[API] Process endpoint called');
   console.log('[API] Method:', req.method);
-  console.log('[API] Body:', JSON.stringify(req.body, null, 2));
   
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,7 +27,7 @@ export default async function handler(req, res) {
     console.log('[API] Processing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await db.getRules();
+    const allRules = await storage.getRules();
     console.log('[API] Retrieved rules:', allRules.length);
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
@@ -44,7 +43,14 @@ export default async function handler(req, res) {
     }
 
     // Store processed data
-    const processedEntry = await db.processData(payload, appliedLabels);
+    const processedEntry = {
+      id: `entry-${Date.now()}`,
+      payload,
+      labels: appliedLabels,
+      created_at: new Date().toISOString()
+    };
+
+    await storage.addProcessedEntry(processedEntry);
     console.log('[API] Stored processed entry:', processedEntry.id);
 
     console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);

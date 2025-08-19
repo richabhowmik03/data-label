@@ -1,4 +1,4 @@
-import { db, evaluateRule } from '../lib/supabase.js';
+import { storage, evaluateRule } from '../lib/storage.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     console.log('[API] Testing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await db.getRules();
+    const allRules = await storage.getRules();
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Testing with ${rules.length} active rules`);
