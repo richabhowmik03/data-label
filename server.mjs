@@ -365,7 +365,92 @@ app.get('*', (req, res) => {
 });
 
 // Initialize with sample data
-const sampleRules = [
+const initializeDefaultRules = () => {
+  // Only initialize if no rules exist
+  if (rules.length > 0) {
+    return;
+  }
+
+  const sampleRules = [
+    {
+      id: uuidv4(),
+      name: 'High Value Companies',
+      conditions: {
+        type: 'group',
+        operator: 'OR',
+        conditions: [
+          { type: 'condition', key: 'CompanyName', operator: '=', value: 'Google' },
+          {
+            type: 'group',
+            operator: 'AND',
+            conditions: [
+              { type: 'condition', key: 'CompanyName', operator: '=', value: 'Amazon' },
+              { type: 'condition', key: 'Price', operator: '<', value: '2.5' }
+            ]
+          }
+        ]
+      },
+      label: 'Green',
+      priority: 3,
+      enabled: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: uuidv4(),
+      name: 'Standard Price Products',
+      conditions: {
+        type: 'group',
+        operator: 'AND',
+        conditions: [
+          { type: 'condition', key: 'Price', operator: '=', value: '2' }
+        ]
+      },
+      label: 'Orange',
+      priority: 2,
+      enabled: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: uuidv4(),
+      name: 'Low MOQ Budget Products',
+      conditions: {
+        type: 'group',
+        operator: 'AND',
+        conditions: [
+          { type: 'condition', key: 'MOQ', operator: '<', value: '100' },
+          { type: 'condition', key: 'Price', operator: '<', value: '1.5' }
+        ]
+      },
+      label: 'Green',
+      priority: 1,
+      enabled: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+
+  rules = sampleRules;
+  
+  console.log(`Initialized with ${rules.length} default rules:`);
+  rules.forEach(rule => {
+    console.log(`- ${rule.name} (${rule.label}, Priority: ${rule.priority})`);
+  });
+};
+
+// Call initialization function
+initializeDefaultRules();
+
+// Also initialize on first API call if rules are empty
+app.use('/api', (req, res, next) => {
+  if (rules.length === 0) {
+    initializeDefaultRules();
+  }
+  next();
+});
+
+const originalSampleRules = [
   {
     id: uuidv4(),
     name: 'High Value Companies',
@@ -425,13 +510,6 @@ const sampleRules = [
   }
 ];
 
-rules = sampleRules;
-
-// Log initialization for debugging
-console.log(`Initialized with ${rules.length} default rules:`);
-rules.forEach(rule => {
-  console.log(`- ${rule.name} (${rule.label}, Priority: ${rule.priority})`);
-});
 app.listen(PORT, () => {
   console.log(`Advanced Data Labeling Engine API running on port ${PORT}`);
   console.log(`API Documentation available at http://localhost:${PORT}/api/docs`);
