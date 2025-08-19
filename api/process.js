@@ -1,8 +1,7 @@
-import { storage, evaluateRule } from '../lib/storage.js';
+import { memoryStore, evaluateRule } from '../lib/memory-store.js';
 
 export default async function handler(req, res) {
   console.log('[API] Process endpoint called');
-  console.log('[API] Method:', req.method);
   
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,9 +18,6 @@ export default async function handler(req, res) {
 
   try {
     const payload = req.body;
-    console.log('[API] Process - Environment:', process.env.NODE_ENV);
-    console.log('[API] Process - Platform:', process.platform);
-    console.log('[API] Process - CWD:', process.cwd());
 
     if (!payload || typeof payload !== 'object') {
       return res.status(400).json({ error: 'Invalid JSON payload' });
@@ -30,8 +26,7 @@ export default async function handler(req, res) {
     console.log('[API] Processing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await storage.getRules();
-    console.log('[API] Retrieved rules:', allRules.length);
+    const allRules = memoryStore.getRules();
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Processing with ${rules.length} active rules`);
@@ -53,10 +48,8 @@ export default async function handler(req, res) {
       created_at: new Date().toISOString()
     };
 
-    await storage.addProcessedEntry(processedEntry);
+    memoryStore.addProcessedEntry(processedEntry);
     console.log('[API] Stored processed entry:', processedEntry.id);
-
-    console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);
 
     const response = {
       id: processedEntry.id,
@@ -70,8 +63,7 @@ export default async function handler(req, res) {
     console.error('[API] Error processing payload:', error);
     return res.status(500).json({ 
       error: 'Internal server error', 
-      details: error.message,
-      stack: error.stack 
+      details: error.message
     });
   }
 }

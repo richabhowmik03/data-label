@@ -1,6 +1,8 @@
-import { storage } from '../lib/storage.js';
+import { memoryStore } from '../lib/memory-store.js';
 
 export default async function handler(req, res) {
+  console.log(`[API] Rules endpoint called - Method: ${req.method}`);
+  
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -12,8 +14,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      console.log('[API] Fetching rules...');
-      const rules = await storage.getRules();
+      const rules = memoryStore.getRules();
       console.log(`[API] Returning ${rules.length} rules`);
       return res.status(200).json(rules);
     }
@@ -27,7 +28,6 @@ export default async function handler(req, res) {
 
       console.log(`[API] Creating rule: ${name}`);
       
-      const rules = await storage.getRules();
       const newRule = {
         id: `rule-${Date.now()}`,
         name,
@@ -39,12 +39,9 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString()
       };
       
-      rules.push(newRule);
-      rules.sort((a, b) => b.priority - a.priority);
-      await storage.saveRules(rules);
-
-      console.log(`[API] Created rule with ID: ${newRule.id}`);
-      return res.status(201).json(newRule);
+      const createdRule = memoryStore.addRule(newRule);
+      console.log(`[API] Created rule with ID: ${createdRule.id}`);
+      return res.status(201).json(createdRule);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

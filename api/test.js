@@ -1,6 +1,8 @@
-import { storage, evaluateRule } from '../lib/storage.js';
+import { memoryStore, evaluateRule } from '../lib/memory-store.js';
 
 export default async function handler(req, res) {
+  console.log('[API] Test endpoint called');
+  
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -24,7 +26,7 @@ export default async function handler(req, res) {
     console.log('[API] Testing payload:', JSON.stringify(payload));
 
     // Get all enabled rules ordered by priority
-    const allRules = await storage.getRules();
+    const allRules = memoryStore.getRules();
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Testing with ${rules.length} active rules`);

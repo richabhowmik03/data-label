@@ -1,4 +1,4 @@
-import { db } from '../../lib/supabase.js';
+import { memoryStore } from '../../lib/memory-store.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       const { name, conditions, label, priority, enabled } = req.body;
 
       console.log(`[API] Updating rule: ${id}`);
-      const rule = await db.updateRule(id, {
+      const rule = memoryStore.updateRule(id, {
         name,
         conditions,
         label,
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       console.log(`[API] Deleting rule: ${id}`);
-      await db.deleteRule(id);
+      memoryStore.deleteRule(id);
       console.log(`[API] Deleted rule: ${id}`);
       return res.status(204).end();
     }

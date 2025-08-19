@@ -1,4 +1,4 @@
-import { db } from '../../../lib/supabase.js';
+import { memoryStore } from '../../../lib/memory-store.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     console.log(`[API] Toggling rule: ${id}`);
     
     // Get current rules to find the one to toggle
-    const rules = await db.getRules();
+    const rules = memoryStore.getRules();
     const currentRule = rules.find(r => r.id === id);
     
     if (!currentRule) {
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     }
 
     // Toggle the enabled status
-    const updatedRule = await db.updateRule(id, { enabled: !currentRule.enabled });
+    const updatedRule = memoryStore.updateRule(id, { enabled: !currentRule.enabled });
     
     console.log(`[API] Toggled rule ${id}: enabled = ${updatedRule.enabled}`);
     return res.status(200).json(updatedRule);
