@@ -1,4 +1,4 @@
-import { memoryStore } from '../lib/memory-store.js';
+import { database } from '../lib/database.js';
 
 export default async function handler(req, res) {
   console.log('[API] Statistics endpoint called');
@@ -21,12 +21,8 @@ export default async function handler(req, res) {
     const { label, from, to } = req.query;
     console.log('[API] Fetching statistics with filters:', { label, from, to });
 
-    // Get debug info first
-    const debugInfo = memoryStore.getDebugInfo();
-    console.log('[API] Debug info:', debugInfo);
-
-    // Get statistics
-    const statistics = memoryStore.getStatistics({ label, from, to });
+    // Get statistics from database
+    const statistics = await database.getStatistics({ label, from, to });
 
     console.log(`[API] Returning statistics:`, {
       totalProcessed: statistics.totalProcessed,
