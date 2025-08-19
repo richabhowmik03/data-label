@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Settings, BarChart3, Zap, Moon, Sun } from 'lucide-react';
+import { Settings, BarChart3, DatabaseZap, Moon, Sun } from 'lucide-react';
 
 interface NavigationProps {
   activeTab: string;
@@ -29,11 +29,11 @@ const Navigation: React.FC<NavigationProps> = ({
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
-              <Zap className="h-8 w-8 text-blue-600" />
+              <DatabaseZap className="h-8 w-8 text-blue-600" />
               <h1 className={`text-xl font-bold transition-colors duration-200 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                Advanced Data Labeling Engine
+                Data Labeling Engine
               </h1>
             </div>
           </div>
