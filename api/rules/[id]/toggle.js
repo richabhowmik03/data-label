@@ -1,4 +1,4 @@
-let rules = [];
+import { rules } from '../../_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS

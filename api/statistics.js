@@ -1,4 +1,4 @@
-let processedData = [];
+import { processedData, statistics } from './_shared/data.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -34,7 +34,7 @@ export default function handler(req, res) {
         );
       }
       
-      // Calculate statistics
+      // Calculate statistics from current data
       const labelCounts = {};
       let totalProcessed = filteredData.length;
       
@@ -51,14 +51,17 @@ export default function handler(req, res) {
           : 0;
       });
       
+      console.log(`Statistics: ${totalProcessed} total, ${Object.keys(labelCounts).length} unique labels`);
+      
       res.status(200).json({
         totalProcessed,
         labelCounts,
         labelPercentages,
-        lastUpdated: new Date().toISOString(),
+        lastUpdated: statistics.lastUpdated,
         recentEntries: filteredData.slice(-10).reverse()
       });
     } catch (error) {
+      console.error('Statistics query failed:', error);
       res.status(400).json({ error: 'Statistics query failed', details: error.message });
     }
     return;
