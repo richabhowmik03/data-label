@@ -19,6 +19,8 @@ export default async function handler(req, res) {
 
   try {
     const { label, from, to } = req.query;
+    console.log('[API] Statistics - Environment:', process.env.NODE_ENV);
+    console.log('[API] Statistics - Platform:', process.platform);
 
     console.log('[API] Fetching statistics with filters:', { label, from, to });
 

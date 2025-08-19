@@ -19,6 +19,9 @@ export default async function handler(req, res) {
 
   try {
     const payload = req.body;
+    console.log('[API] Process - Environment:', process.env.NODE_ENV);
+    console.log('[API] Process - Platform:', process.platform);
+    console.log('[API] Process - CWD:', process.cwd());
 
     if (!payload || typeof payload !== 'object') {
       return res.status(400).json({ error: 'Invalid JSON payload' });

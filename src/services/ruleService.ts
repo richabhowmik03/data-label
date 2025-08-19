@@ -46,6 +46,7 @@ export const ruleService = {
 
   async processPayload(payload: any): Promise<{ id: string; labels: string[]; timestamp: string }> {
     console.log('Sending payload to /api/process:', payload);
+    console.log('API Base URL:', API_BASE);
     const response = await fetch(`${API_BASE}/process`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -53,6 +54,7 @@ export const ruleService = {
     });
     
     console.log('Process response status:', response.status);
+    console.log('Process response headers:', Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
       const errorText = await response.text();
