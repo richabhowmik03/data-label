@@ -159,3 +159,5 @@ export {
   getProcessedData,
   getStatistics
 };
+
+export { rules }
