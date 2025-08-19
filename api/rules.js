@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase.js';
+import { db } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -12,16 +12,8 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const { data: rules, error } = await supabase
-        .from('rules')
-        .select('*')
-        .order('priority', { ascending: false });
-
-      if (error) {
-        console.error('[API] Error fetching rules:', error);
-        return res.status(500).json({ error: 'Failed to fetch rules', details: error.message });
-      }
-
+      console.log('[API] Fetching rules...');
+      const rules = await db.getRules();
       console.log(`[API] Returning ${rules.length} rules`);
       return res.status(200).json(rules);
     }
@@ -33,30 +25,22 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing required fields: name, conditions, label' });
       }
 
-      const { data: rule, error } = await supabase
-        .from('rules')
-        .insert([{
-          name,
-          conditions,
-          label,
-          priority,
-          enabled
-        }])
-        .select()
-        .single();
+      console.log(`[API] Creating rule: ${name}`);
+      const rule = await db.createRule({
+        name,
+        conditions,
+        label,
+        priority,
+        enabled
+      });
 
-      if (error) {
-        console.error('[API] Error creating rule:', error);
-        return res.status(500).json({ error: 'Failed to create rule', details: error.message });
-      }
-
-      console.log(`[API] Created rule: ${rule.name}`);
+      console.log(`[API] Created rule with ID: ${rule.id}`);
       return res.status(201).json(rule);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
-    console.error('[API] Unexpected error:', error);
+    console.error('[API] Error in rules endpoint:', error);
     return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }

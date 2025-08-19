@@ -1,4 +1,4 @@
-import { supabase, evaluateRule } from '../lib/supabase.js';
+import { db, evaluateRule } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -21,19 +21,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON payload' });
     }
 
+    console.log('[API] Processing payload:', JSON.stringify(payload));
+
     // Get all enabled rules ordered by priority
-    const { data: rules, error: rulesError } = await supabase
-      .from('rules')
-      .select('*')
-      .eq('enabled', true)
-      .order('priority', { ascending: false });
+    const allRules = await db.getRules();
+    const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
-    if (rulesError) {
-      console.error('[API] Error fetching rules:', rulesError);
-      return res.status(500).json({ error: 'Failed to fetch rules', details: rulesError.message });
-    }
-
-    console.log(`[API] Processing payload with ${rules.length} active rules`);
+    console.log(`[API] Processing with ${rules.length} active rules`);
 
     // Evaluate rules and collect matching labels
     const appliedLabels = [];
@@ -44,20 +38,8 @@ export default async function handler(req, res) {
       }
     }
 
-    // Store processed data in Supabase
-    const { data: processedEntry, error: insertError } = await supabase
-      .from('processed_data')
-      .insert([{
-        payload,
-        labels: appliedLabels
-      }])
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('[API] Error storing processed data:', insertError);
-      return res.status(500).json({ error: 'Failed to store processed data', details: insertError.message });
-    }
+    // Store processed data
+    const processedEntry = await db.processData(payload, appliedLabels);
 
     console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);
 
@@ -67,7 +49,7 @@ export default async function handler(req, res) {
       timestamp: processedEntry.created_at
     });
   } catch (error) {
-    console.error('[API] Unexpected error:', error);
+    console.error('[API] Error processing payload:', error);
     return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }

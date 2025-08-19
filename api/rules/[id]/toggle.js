@@ -1,4 +1,4 @@
-import { supabase } from '../../../lib/supabase.js';
+import { db } from '../../../lib/supabase.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -17,39 +17,23 @@ export default async function handler(req, res) {
   const { id } = req.query;
 
   try {
-    // First get the current rule
-    const { data: currentRule, error: fetchError } = await supabase
-      .from('rules')
-      .select('enabled')
-      .eq('id', id)
-      .single();
-
-    if (fetchError) {
-      console.error('[API] Error fetching rule for toggle:', fetchError);
-      return res.status(500).json({ error: 'Failed to fetch rule', details: fetchError.message });
-    }
-
+    console.log(`[API] Toggling rule: ${id}`);
+    
+    // Get current rules to find the one to toggle
+    const rules = await db.getRules();
+    const currentRule = rules.find(r => r.id === id);
+    
     if (!currentRule) {
       return res.status(404).json({ error: 'Rule not found' });
     }
 
     // Toggle the enabled status
-    const { data: rule, error } = await supabase
-      .from('rules')
-      .update({ enabled: !currentRule.enabled })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('[API] Error toggling rule:', error);
-      return res.status(500).json({ error: 'Failed to toggle rule', details: error.message });
-    }
-
-    console.log(`[API] Toggled rule ${id}: enabled = ${rule.enabled}`);
-    return res.status(200).json(rule);
+    const updatedRule = await db.updateRule(id, { enabled: !currentRule.enabled });
+    
+    console.log(`[API] Toggled rule ${id}: enabled = ${updatedRule.enabled}`);
+    return res.status(200).json(updatedRule);
   } catch (error) {
-    console.error('[API] Unexpected error:', error);
+    console.error('[API] Error toggling rule:', error);
     return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }

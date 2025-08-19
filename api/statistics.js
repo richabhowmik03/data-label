@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase.js';
+import { db } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
   // Enable CORS
@@ -17,34 +17,18 @@ export default async function handler(req, res) {
   try {
     const { label, from, to } = req.query;
 
-    // Build query for processed data
-    let query = supabase
-      .from('processed_data')
-      .select('*')
-      .order('created_at', { ascending: false });
+    console.log('[API] Fetching statistics with filters:', { label, from, to });
 
-    // Apply date filters
-    if (from) {
-      query = query.gte('created_at', from);
-    }
-    if (to) {
-      query = query.lte('created_at', to);
-    }
+    // Get processed data with filters
+    const processedData = await db.getProcessedData({ from, to });
 
-    const { data: processedData, error } = await query;
-
-    if (error) {
-      console.error('[API] Error fetching processed data:', error);
-      return res.status(500).json({ error: 'Failed to fetch statistics', details: error.message });
-    }
-
-    console.log(`[API] Statistics request - Total entries: ${processedData.length}`);
+    console.log(`[API] Found ${processedData.length} processed entries`);
 
     // Apply label filter if specified
     let filteredData = processedData;
     if (label) {
       filteredData = processedData.filter(entry => 
-        entry.labels && entry.labels.includes(label)
+        entry.labels && Array.isArray(entry.labels) && entry.labels.includes(label)
       );
       console.log(`[API] After label filter (${label}): ${filteredData.length} entries`);
     }
@@ -93,7 +77,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json(result);
   } catch (error) {
-    console.error('[API] Unexpected error:', error);
+    console.error('[API] Error fetching statistics:', error);
     return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
