@@ -2,6 +2,7 @@ import { db } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
   console.log('[API] Statistics endpoint called');
+  console.log('[API] Query parameters:', req.query);
   
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
