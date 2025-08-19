@@ -1,7 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// This would need to be shared with the main rules.js file
-// In a real app, you'd use a database or shared storage
 let rules = [];
 
 export default function handler(req, res) {
