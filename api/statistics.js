@@ -1,0 +1,69 @@
+// Shared storage (in production, use a database)
+let processedData = [];
+
+export default function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  if (req.method === 'GET') {
+    try {
+      const { label, from, to } = req.query;
+      let filteredData = processedData;
+      
+      // Apply date filters
+      if (from || to) {
+        const fromDate = from ? new Date(from) : new Date(0);
+        const toDate = to ? new Date(to) : new Date();
+        
+        filteredData = processedData.filter(entry => {
+          const entryDate = new Date(entry.timestamp);
+          return entryDate >= fromDate && entryDate <= toDate;
+        });
+      }
+      
+      // Apply label filter
+      if (label) {
+        filteredData = filteredData.filter(entry => 
+          entry.labels.includes(label)
+        );
+      }
+      
+      // Calculate statistics
+      const labelCounts = {};
+      let totalProcessed = filteredData.length;
+      
+      filteredData.forEach(entry => {
+        entry.labels.forEach(lbl => {
+          labelCounts[lbl] = (labelCounts[lbl] || 0) + 1;
+        });
+      });
+      
+      const labelPercentages = {};
+      Object.keys(labelCounts).forEach(lbl => {
+        labelPercentages[lbl] = totalProcessed > 0 
+          ? Math.round((labelCounts[lbl] / totalProcessed) * 100 * 100) / 100 
+          : 0;
+      });
+      
+      res.status(200).json({
+        totalProcessed,
+        labelCounts,
+        labelPercentages,
+        lastUpdated: new Date().toISOString(),
+        recentEntries: filteredData.slice(-10).reverse()
+      });
+    } catch (error) {
+      res.status(400).json({ error: 'Statistics query failed', details: error.message });
+    }
+    return;
+  }
+
+  res.status(405).json({ error: 'Method not allowed' });
+}
