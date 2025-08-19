@@ -368,7 +368,7 @@ app.get('*', (req, res) => {
 const sampleRules = [
   {
     id: uuidv4(),
-    name: 'CompanyName = "Google" OR (CompanyName = "Amazon" AND Price < 2.5)',
+    name: 'High Value Companies',
     conditions: {
       type: 'group',
       operator: 'OR',
@@ -392,7 +392,7 @@ const sampleRules = [
   },
   {
     id: uuidv4(),
-    name: 'Price = 2',
+    name: 'Standard Price Products',
     conditions: {
       type: 'group',
       operator: 'AND',
@@ -408,7 +408,7 @@ const sampleRules = [
   },
   {
     id: uuidv4(),
-    name: 'MOQ < 100 AND Price < 1.5',
+    name: 'Low MOQ Budget Products',
     conditions: {
       type: 'group',
       operator: 'AND',
@@ -427,6 +427,11 @@ const sampleRules = [
 
 rules = sampleRules;
 
+// Log initialization for debugging
+console.log(`Initialized with ${rules.length} default rules:`);
+rules.forEach(rule => {
+  console.log(`- ${rule.name} (${rule.label}, Priority: ${rule.priority})`);
+});
 app.listen(PORT, () => {
   console.log(`Advanced Data Labeling Engine API running on port ${PORT}`);
   console.log(`API Documentation available at http://localhost:${PORT}/api/docs`);
