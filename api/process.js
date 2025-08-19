@@ -1,9 +1,14 @@
-import { db, evaluateRule } from '../lib/database.js';
+import { db, evaluateRule } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
+  console.log('[API] Process endpoint called');
+  console.log('[API] Method:', req.method);
+  console.log('[API] Body:', JSON.stringify(req.body, null, 2));
+  
+  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -20,26 +25,44 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid JSON payload' });
     }
 
-    // Get enabled rules sorted by priority
-    const rules = db.getRules().filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
+    console.log('[API] Processing payload:', JSON.stringify(payload));
 
-    // Evaluate rules and collect labels
+    // Get all enabled rules ordered by priority
+    const allRules = await db.getRules();
+    console.log('[API] Retrieved rules:', allRules.length);
+    const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
+
+    console.log(`[API] Processing with ${rules.length} active rules`);
+
+    // Evaluate rules and collect matching labels
     const appliedLabels = [];
     for (const rule of rules) {
       if (evaluateRule(payload, rule)) {
         appliedLabels.push(rule.label);
+        console.log(`[API] Rule "${rule.name}" matched, applied label: ${rule.label}`);
       }
     }
 
     // Store processed data
-    const processedEntry = db.processData(payload, appliedLabels);
+    const processedEntry = await db.processData(payload, appliedLabels);
+    console.log('[API] Stored processed entry:', processedEntry.id);
 
-    return res.status(200).json({
+    console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);
+
+    const response = {
       id: processedEntry.id,
       labels: appliedLabels,
-      timestamp: processedEntry.timestamp
-    });
+      timestamp: processedEntry.created_at
+    };
+    
+    console.log('[API] Sending response:', response);
+    return res.status(200).json(response);
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('[API] Error processing payload:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message,
+      stack: error.stack 
+    });
   }
 }
