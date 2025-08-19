@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// In-memory storage (in production, you'd want to use a database)
 let rules = [
   {
     id: 'default-rule-1',
