@@ -65,7 +65,39 @@ const JsonInput: React.FC<JsonInputProps> = ({ onKeysChange, rules, isDarkMode }
   };
 
   const addToDashboard = async () => {
-    await processRules(true);
+    if (!isValid || !jsonValue.trim()) {
+      setError('Please provide valid JSON first');
+      return;
+    }
+
+    setError('');
+    setIsTesting(true);
+
+    try {
+      const parsed = JSON.parse(jsonValue);
+      console.log('Processing payload for dashboard:', parsed);
+      
+      const result = await ruleService.processPayload(parsed);
+      console.log('Process result:', result);
+      
+      setTestResults(result);
+      
+      // Clear the JSON input after successful processing
+      setJsonValue('');
+      setExtractedKeys([]);
+      setIsValid(false);
+      onKeysChange([]);
+      
+      // Show success message
+      alert(`Successfully processed! Applied labels: ${result.labels.join(', ') || 'None'}`);
+      
+    } catch (err) {
+      console.error('Error processing for dashboard:', err);
+      setError(`Failed to process data: ${err.message}`);
+      setTestResults(null);
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   const processRules = async (addToDashboard: boolean) => {

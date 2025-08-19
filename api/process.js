@@ -1,6 +1,10 @@
 import { db, evaluateRule } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
+  console.log('[API] Process endpoint called');
+  console.log('[API] Method:', req.method);
+  console.log('[API] Body:', JSON.stringify(req.body, null, 2));
+  
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -25,6 +29,7 @@ export default async function handler(req, res) {
 
     // Get all enabled rules ordered by priority
     const allRules = await db.getRules();
+    console.log('[API] Retrieved rules:', allRules.length);
     const rules = allRules.filter(rule => rule.enabled).sort((a, b) => b.priority - a.priority);
 
     console.log(`[API] Processing with ${rules.length} active rules`);
@@ -40,16 +45,24 @@ export default async function handler(req, res) {
 
     // Store processed data
     const processedEntry = await db.processData(payload, appliedLabels);
+    console.log('[API] Stored processed entry:', processedEntry.id);
 
     console.log(`[API] Processed entry with labels: [${appliedLabels.join(', ')}]`);
 
-    return res.status(200).json({
+    const response = {
       id: processedEntry.id,
       labels: appliedLabels,
       timestamp: processedEntry.created_at
-    });
+    };
+    
+    console.log('[API] Sending response:', response);
+    return res.status(200).json(response);
   } catch (error) {
     console.error('[API] Error processing payload:', error);
-    return res.status(500).json({ error: 'Internal server error', details: error.message });
+    return res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message,
+      stack: error.stack 
+    });
   }
 }

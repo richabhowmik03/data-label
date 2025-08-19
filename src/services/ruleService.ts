@@ -45,13 +45,24 @@ export const ruleService = {
   },
 
   async processPayload(payload: any): Promise<{ id: string; labels: string[]; timestamp: string }> {
+    console.log('Sending payload to /api/process:', payload);
     const response = await fetch(`${API_BASE}/process`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error('Failed to process payload');
-    return response.json();
+    
+    console.log('Process response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Process error response:', errorText);
+      throw new Error(`Failed to process payload: ${response.status} - ${errorText}`);
+    }
+    
+    const result = await response.json();
+    console.log('Process result from API:', result);
+    return result;
   },
 
   async testPayload(payload: any): Promise<{ labels: string[]; timestamp: string }> {

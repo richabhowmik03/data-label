@@ -1,6 +1,8 @@
 import { db } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
+  console.log('[API] Statistics endpoint called');
+  
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -22,7 +24,7 @@ export default async function handler(req, res) {
     // Get processed data with filters
     const processedData = await db.getProcessedData({ from, to });
 
-    console.log(`[API] Found ${processedData.length} processed entries`);
+    console.log(`[API] Found ${processedData.length} processed entries:`, processedData);
 
     // Apply label filter if specified
     let filteredData = processedData;
