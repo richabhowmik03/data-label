@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 
-// Shared storage (in production, use a database)
 let processedData = [];
 let statistics = {
   totalProcessed: 0,
@@ -8,7 +7,6 @@ let statistics = {
   lastUpdated: new Date()
 };
 
-// Default rules (should be shared with rules.js)
 const rules = [
   {
     id: 'default-rule-1',
