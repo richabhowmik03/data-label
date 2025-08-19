@@ -12,7 +12,65 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
 // In-memory storage
-let rules = [];
+let rules = [
+  {
+    id: 'default-rule-1',
+    name: 'High Value Companies',
+    conditions: {
+      type: 'group',
+      operator: 'OR',
+      conditions: [
+        { type: 'condition', key: 'CompanyName', operator: '=', value: 'Google' },
+        {
+          type: 'group',
+          operator: 'AND',
+          conditions: [
+            { type: 'condition', key: 'CompanyName', operator: '=', value: 'Amazon' },
+            { type: 'condition', key: 'Price', operator: '<', value: '2.5' }
+          ]
+        }
+      ]
+    },
+    label: 'Green',
+    priority: 3,
+    enabled: true,
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z')
+  },
+  {
+    id: 'default-rule-2',
+    name: 'Standard Price Products',
+    conditions: {
+      type: 'group',
+      operator: 'AND',
+      conditions: [
+        { type: 'condition', key: 'Price', operator: '=', value: '2' }
+      ]
+    },
+    label: 'Orange',
+    priority: 2,
+    enabled: true,
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z')
+  },
+  {
+    id: 'default-rule-3',
+    name: 'Low MOQ Budget Products',
+    conditions: {
+      type: 'group',
+      operator: 'AND',
+      conditions: [
+        { type: 'condition', key: 'MOQ', operator: '<', value: '100' },
+        { type: 'condition', key: 'Price', operator: '<', value: '1.5' }
+      ]
+    },
+    label: 'Green',
+    priority: 1,
+    enabled: true,
+    createdAt: new Date('2024-01-01T00:00:00Z'),
+    updatedAt: new Date('2024-01-01T00:00:00Z')
+  }
+];
 let processedData = [];
 let statistics = {
   totalProcessed: 0,
@@ -81,6 +139,7 @@ function updateStatistics(labels) {
 
 // Rules endpoints
 app.get('/api/rules', (req, res) => {
+  console.log(`Returning ${rules.length} rules:`, rules.map(r => r.name));
   res.json(rules);
 });
 
@@ -364,155 +423,10 @@ app.get('*', (req, res) => {
   }
 });
 
-// Initialize with sample data
-const initializeDefaultRules = () => {
-  // Only initialize if no rules exist
-  if (rules.length > 0) {
-    return;
-  }
-
-  const sampleRules = [
-    {
-      id: uuidv4(),
-      name: 'High Value Companies',
-      conditions: {
-        type: 'group',
-        operator: 'OR',
-        conditions: [
-          { type: 'condition', key: 'CompanyName', operator: '=', value: 'Google' },
-          {
-            type: 'group',
-            operator: 'AND',
-            conditions: [
-              { type: 'condition', key: 'CompanyName', operator: '=', value: 'Amazon' },
-              { type: 'condition', key: 'Price', operator: '<', value: '2.5' }
-            ]
-          }
-        ]
-      },
-      label: 'Green',
-      priority: 3,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      id: uuidv4(),
-      name: 'Standard Price Products',
-      conditions: {
-        type: 'group',
-        operator: 'AND',
-        conditions: [
-          { type: 'condition', key: 'Price', operator: '=', value: '2' }
-        ]
-      },
-      label: 'Orange',
-      priority: 2,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    },
-    {
-      id: uuidv4(),
-      name: 'Low MOQ Budget Products',
-      conditions: {
-        type: 'group',
-        operator: 'AND',
-        conditions: [
-          { type: 'condition', key: 'MOQ', operator: '<', value: '100' },
-          { type: 'condition', key: 'Price', operator: '<', value: '1.5' }
-        ]
-      },
-      label: 'Green',
-      priority: 1,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  ];
-
-  rules = sampleRules;
-  
-  console.log(`Initialized with ${rules.length} default rules:`);
-  rules.forEach(rule => {
-    console.log(`- ${rule.name} (${rule.label}, Priority: ${rule.priority})`);
-  });
-};
-
-// Call initialization function
-initializeDefaultRules();
-
-// Also initialize on first API call if rules are empty
-app.use('/api', (req, res, next) => {
-  if (rules.length === 0) {
-    initializeDefaultRules();
-  }
-  next();
-});
-
-const originalSampleRules = [
-  {
-    id: uuidv4(),
-    name: 'High Value Companies',
-    conditions: {
-      type: 'group',
-      operator: 'OR',
-      conditions: [
-        { type: 'condition', key: 'CompanyName', operator: '=', value: 'Google' },
-        {
-          type: 'group',
-          operator: 'AND',
-          conditions: [
-            { type: 'condition', key: 'CompanyName', operator: '=', value: 'Amazon' },
-            { type: 'condition', key: 'Price', operator: '<', value: '2.5' }
-          ]
-        }
-      ]
-    },
-    label: 'Green',
-    priority: 3,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: uuidv4(),
-    name: 'Standard Price Products',
-    conditions: {
-      type: 'group',
-      operator: 'AND',
-      conditions: [
-        { type: 'condition', key: 'Price', operator: '=', value: '2' }
-      ]
-    },
-    label: 'Orange',
-    priority: 2,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: uuidv4(),
-    name: 'Low MOQ Budget Products',
-    conditions: {
-      type: 'group',
-      operator: 'AND',
-      conditions: [
-        { type: 'condition', key: 'MOQ', operator: '<', value: '100' },
-        { type: 'condition', key: 'Price', operator: '<', value: '1.5' }
-      ]
-    },
-    label: 'Green',
-    priority: 1,
-    enabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
-
 app.listen(PORT, () => {
   console.log(`Advanced Data Labeling Engine API running on port ${PORT}`);
   console.log(`API Documentation available at http://localhost:${PORT}/api/docs`);
+  console.log(`Server started with ${rules.length} default rules`);
 });
 
 export default app;
