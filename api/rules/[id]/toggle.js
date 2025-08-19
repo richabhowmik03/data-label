@@ -1,4 +1,3 @@
-// This would need to be shared with the main rules.js file
 let rules = [];
 
 export default function handler(req, res) {
