@@ -12,6 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
     "body-parser": "^1.20.2",
     "chart.js": "^4.4.1",
     "concurrently": "^8.2.2",

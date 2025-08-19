@@ -1,6 +1,6 @@
 # Data Labeling Engine
 
-A sophisticated data labeling system that automatically processes JSON payloads using user-defined rules and provides comprehensive analytics.
+A sophisticated data labeling system that automatically processes JSON payloads using user-defined rules and provides comprehensive analytics. Built with React, Node.js, and Supabase for reliable data persistence.
 
 ##  Features
 
@@ -51,8 +51,9 @@ GET    /api/docs           # OpenAPI documentation
 ## 🛠️ Setup Instructions
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 18+ 
 - npm or yarn
+- Supabase account and project
 
 ### Installation
 1. Clone the repository
@@ -60,6 +61,14 @@ GET    /api/docs           # OpenAPI documentation
    ```bash
    npm install
    ```
+3. Set up Supabase:
+   - Create a new Supabase project at https://supabase.com
+   - Copy your project URL and API keys
+   - Create a `.env` file based on `.env.example`
+   - Run the database migration in your Supabase SQL editor:
+     ```sql
+     -- Copy and paste the contents of supabase/migrations/001_initial_schema.sql
+     ```
 
 ### Development
 Start both frontend and backend servers:
@@ -71,11 +80,27 @@ This will start:
 - Backend API server on http://localhost:3001
 - Frontend development server on http://localhost:5173
 
+### Environment Variables
+Create a `.env` file with your Supabase credentials:
+```
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
+
 ### Production Build
 ```bash
 npm run build
 npm run preview
 ```
+
+### Deployment
+The application is ready for deployment on Vercel:
+1. Connect your repository to Vercel
+2. Add your Supabase environment variables in Vercel's dashboard
+3. Deploy - the API routes will work automatically with Vercel's serverless functions
+
+Data will persist across deployments and serverless function restarts thanks to Supabase.
 
 ## Sample Data
 
@@ -109,17 +134,18 @@ The system comes pre-configured with sample rules and supports the following JSO
 - **Services**: API integration layer
 - **Types**: TypeScript definitions for type safety
 
-### Backend (Node.js + Express)
+### Backend (Serverless API Routes)
 - **RESTful API**: Clean, documented endpoints
-- **In-Memory Storage**: Fast data access and manipulation
+- **Supabase Integration**: Persistent PostgreSQL database
 - **Rule Engine**: Sophisticated condition evaluation system
 - **Statistics Engine**: Real-time analytics computation
 
 ### Key Technologies
 - **Frontend**: React 18, TypeScript, Tailwind CSS, Chart.js
-- **Backend**: Express.js, Node.js, UUID for unique IDs
+- **Backend**: Vercel Serverless Functions, Supabase PostgreSQL
 - **Development**: Vite, ESLint, Concurrent execution
 - **Export**: jsPDF, Papa Parse for CSV/PDF generation
+- **Database**: Supabase (PostgreSQL with real-time features)
 
 ## Usage Examples
 
@@ -148,9 +174,10 @@ curl -X POST http://localhost:3001/api/process \
 
 ## Assumptions Made
 
-- JSON payloads follow consistent schema structure
+- JSON payloads follow consistent schema structure  
 - Rule priorities are positive integers (higher = more important)
 - Labels are simple strings without special formatting requirements
 - Date filtering uses ISO date format (YYYY-MM-DD)
 - Export functionality requires modern browser support
 - Real-time updates use polling mechanism (10-second intervals)
+- Supabase provides reliable data persistence and handles concurrent access

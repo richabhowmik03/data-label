@@ -1,51 +1,65 @@
-import { rules } from '../_shared/data.js';
+import { supabase } from '../../lib/supabase.js';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   const { id } = req.query;
 
-  if (req.method === 'PUT') {
-    try {
-      const ruleIndex = rules.findIndex(r => r.id === id);
-      if (ruleIndex === -1) {
+  try {
+    if (req.method === 'PUT') {
+      const { name, conditions, label, priority, enabled } = req.body;
+
+      const { data: rule, error } = await supabase
+        .from('rules')
+        .update({
+          name,
+          conditions,
+          label,
+          priority,
+          enabled
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('[API] Error updating rule:', error);
+        return res.status(500).json({ error: 'Failed to update rule', details: error.message });
+      }
+
+      if (!rule) {
         return res.status(404).json({ error: 'Rule not found' });
       }
-      
-      rules[ruleIndex] = {
-        ...rules[ruleIndex],
-        ...req.body,
-        id: id,
-        updatedAt: new Date().toISOString()
-      };
-      
-      rules.sort((a, b) => b.priority - a.priority);
-      
-      res.status(200).json(rules[ruleIndex]);
-    } catch (error) {
-      res.status(400).json({ error: 'Invalid rule format', details: error.message });
-    }
-    return;
-  }
 
-  if (req.method === 'DELETE') {
-    const ruleIndex = rules.findIndex(r => r.id === id);
-    if (ruleIndex === -1) {
-      return res.status(404).json({ error: 'Rule not found' });
+      console.log(`[API] Updated rule: ${rule.name}`);
+      return res.status(200).json(rule);
     }
-    
-    rules.splice(ruleIndex, 1);
-    res.status(204).end();
-    return;
-  }
 
-  res.status(405).json({ error: 'Method not allowed' });
+    if (req.method === 'DELETE') {
+      const { error } = await supabase
+        .from('rules')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('[API] Error deleting rule:', error);
+        return res.status(500).json({ error: 'Failed to delete rule', details: error.message });
+      }
+
+      console.log(`[API] Deleted rule: ${id}`);
+      return res.status(204).end();
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (error) {
+    console.error('[API] Unexpected error:', error);
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
 }
