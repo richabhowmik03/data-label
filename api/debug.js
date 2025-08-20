@@ -21,7 +21,6 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString()
     };
 
-    // Check if /tmp directory exists and is writable
     try {
       await fs.promises.access('/tmp', fs.constants.F_OK | fs.constants.W_OK);
       debugInfo.tmpAccessible = true;
