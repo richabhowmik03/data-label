@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     // Store in local store
     simpleStore.addProcessedEntry(processedEntry);
     
-    // Also try to store via central data API for cross-function access
+    
     try {
       const baseUrl = req.headers.host ? `https://${req.headers.host}` : 'http://localhost:3000';
       const response = await fetch(`${baseUrl}/api/data?action=add-processed`, {
